@@ -1,0 +1,63 @@
+{% extends 'login.html' %}
+
+{% block title %}
+<title>用户注册</title>
+{% endblock %}
+
+{% block main %}
+    <form class="form-horizontal" novalidate>
+        {% csrf_token %}
+        <span class="heading" style="font-family: '微软雅黑 Light'">User Register</span>
+        <div class="form-group">
+            {{ data.username }}
+            <span class="username warning"></span>
+        </div>
+        <div class="form-group help">
+            {{ data.password }}
+            <span class="password warning"></span>
+        </div>
+        <div class="form-group help">
+            {{ data.email }}
+            <span class="email warning"></span>
+        </div>
+        <div class="form-group help">
+            {{ data.role_id }}
+        </div>
+        <div class="form-group">
+            <a href="#" class="btn btn-default" id="confirm" role="button">确认</a>
+            <a href="/user/login/" class="btn btn-default "  style="margin-right: 20px;" role="button">取消</a>
+        </div>
+    </form>
+
+{% endblock %}
+
+
+{% block jquery %}
+    <script>
+        $('#confirm').click(function () {
+
+            $('.form-horizontal').find('.warning').each(function () {
+                $(this).text('');   {# 每次点击都初始化span标签的内容 #}
+            });
+
+            $.ajax({
+                url:'/user/register/',
+                type:'post',
+                dataType:'JSON',
+                data:$('.form-horizontal').serialize(),     {# 把Form表单的数据整体提交 #}
+                success:function (data) {     {# 返回的数据类型如：{'error_msg': {'username': '用户名已存在！'}, 'status': False} #}
+                    if (!data.status){     {# 验证不成功，循环获取错误信息，追加给指定输入框 #}
+                        $.each(data.error_msg,function (key,value) {
+                            console.log(key,value);
+                            $('.'+ key).text(value);
+                        })
+                    } else {    {# 验证成功，跳转到登陆页面 #}
+                        window.location.href = '/user/login/';
+                    }
+                    }
+                })
+            })
+    </script>
+
+
+{% endblock %}
