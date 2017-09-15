@@ -87,6 +87,7 @@ body {
     min-height: 140px;
     padding: 20px;
     background-color: #4380B8;
+    /*background-color:  #202020;*/
 }
 
     .user-img-div img {
@@ -178,7 +179,7 @@ body {
 }
 
 .navbar-cls-top {
-    background: #00CA79;
+    background: white;
     border-bottom: none;
 }
 

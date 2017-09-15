@@ -17,4 +17,6 @@ from django.conf.urls import url
 from hostmanager import views
 urlpatterns = [
     url(r'^index.html',views.Index.as_view()),
+    url(r'^manager.html',views.Manager.as_view()),
+    url(r'^addhost.html',views.AddHost.as_view()),
 ]

@@ -1,0 +1,167 @@
+{% extends "index.html" %}
+
+
+{% block content_title %}
+    <h1 class="page-head-line">主机信息</h1>
+    <h1 class="page-subhead-line"><strong style="font-family: Consolas;font-style:normal">主机是运维日常维护工作的伙伴，请好好对它。</strong></h1>
+{% endblock %}
+
+
+{% block content_main %}
+    <div class="col-md-12">
+
+        <div class="table-responsive">
+            <button type="button" class="btn btn-warning" name="allcheck">
+                全选
+            </button>
+            <button type="button" class="btn btn-warning" name="revcheck">
+                反选
+            </button>
+            <button type="button" class="btn btn-warning" name="allcancel">
+                取消
+            </button>
+
+
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th></th>
+                    <th style="text-align: center">序号</th>
+                    <th style="text-align: center">主机名称</th>
+                    <th style="text-align: center">主机IP地址</th>
+                    <th style="text-align: center">对外端口</th>
+                    <th style="text-align: center">所属业务线</th>
+                    <th style="text-align: center">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for host in host_list %}
+                    <tr style="text-align: center" hid="{{ host.id }}">
+                        <td><input type="checkbox"></td>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ host.hostname }}</td>
+                        <td>{{ host.ip }}</td>
+                        <td>{{ host.port }}</td>
+                        <td>{{ host.business.title }}</td>
+                        <td>
+                            <button type="button" class="btn btn-primary" data-toggle="modal" name="edithost"
+                                    data-target="#edithost" hid="{{ host.hid }}">
+                                编辑
+                            </button>
+                            <button type="button" class="btn btn-info" data-toggle="modal" name="delhost"
+                                    data-target="#delhost" hid="{{ host.hid }}" hostaddr="{{ host.ipaddr }}">
+                                删除
+                            </button>
+
+                        </td>
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+        <!-- 编辑主机模态对话框 -->
+        <div class="modal fade" id="edithost" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="exampleModalLabel">编辑主机</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="input-group">
+                                <span class="input-group-addon" id="modify_hostname">主机名称</span>
+                                <input type="text" class="form-control" placeholder="hostname"
+                                       aria-describedby="sizing-addon2">
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-addon" id="modify_ipaddr">主机地址</span>
+                                <input type="text" class="form-control" placeholder="0.0.0.0"
+                                       aria-describedby="sizing-addon2">
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-addon" id="modify_serviceline">所属业务</span>
+                                <select class="form-control">
+                                    {% for service in service_list %}
+                                        <option value="{{ service.sid }}">{{ service.sname }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-addon" id="modify_admin">管理人员</span>
+                                <select multiple class="form-control" id='admin'>
+                                    {% for user in user_list %}
+                                        <option value="{{ user.uid }}">{{ user.username }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-primary">确认</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block content_bottom %}
+
+{% endblock %}
+
+{% block jquery %}
+
+    <script>
+        $("[name='allcheck']").click(function () {
+            $('table').find($('input')).each(function () {
+                $(this).prop('checked', true)
+            })
+        });
+
+        $("[name='allcancel']").click(function () {
+            $('table').find($('input')).each(function () {
+                $(this).prop('checked', false)
+            })
+        });
+
+        $("[name='revcheck']").click(function () {
+            $('table').find($('input')).each(function () {
+                $(this).prop('checked', !$(this).prop('checked'));
+            })
+        });
+
+        $("[name='addhostok']").click(function () {
+            $.ajax({
+                url: '/manage/addhost/',
+                type: 'post',
+                traditional: true,
+                data: {
+                    'csrfmiddlewaretoken': "{{ csrf_token }}",
+                    'hostname': $('#add_hostname').val(),
+                    'ipaddr': $('#add_ipaddr').val(),
+                    'serviceline': $('#add_serviceline').val(),
+                    'admin': $('#add_admin').val()
+                },
+                success: function (data) {
+                    data = JSON.parse(data);
+                    if (data['status']) {
+                        location.reload()
+                    }
+                }
+
+            })
+        });
+
+        $("[name='delhost']").click(function () {
+            var hostaddr = $(this).attr('hostaddr');
+            $('#delhost').find($("[name='message']")).text("您确定要删除主机：" + hostaddr + '?')
+        })
+    </script>
+{% endblock %}

@@ -1,0 +1,91 @@
+{% extends 'index.html' %}
+
+{% block css %}
+    <style>
+        .warning {
+            color: red;
+        }
+    </style>
+{% endblock %}
+
+{% block content_title %}
+    <h1 class="page-head-line">添加主机</h1>
+    <h1 class="page-subhead-line"><strong style="font-family: Consolas;font-style:normal">请详细确认主机信息是否正确</strong></h1>
+{% endblock %}
+
+{% block content_main %}
+    <div class="col-md-12">
+        <form class="form-horizontal" id = 'register-form' novalidate>
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="hostname" class="col-sm-2 control-label">主机名</label>
+                <div class="col-sm-6">
+                    {{ ha.hostname }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="ip" class="col-sm-2 control-label">IP地址</label>
+                <div class="col-sm-6">
+                    {{ ha.ip }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="port" class="col-sm-2 control-label">应用端口</label>
+                <div class="col-sm-6">
+                    {{ ha.port }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="" class="col-sm-2 control-label">业务线</label>
+                <div class="col-sm-6">
+                    {{ ha.business_id }}
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-8">
+                    <a href="#" class="btn btn-success" id="ok">确认</a>
+                    <a href="/host/manager.html" class="btn btn-primary" >取消</a>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block content_bottom %}
+
+{% endblock %}
+
+{% block jquery %}
+
+    <script>
+        $('#ok').click(function () {
+
+             $('#register-form').find('.warning').each(function () {
+                $(this).text('');  {# 每次点击初始化标签 #}
+            });
+
+            $.ajax({
+                url:'/host/addhost.html',
+                type:'post',
+                dataType:'json',
+                data:$('#register-form').serialize(),
+                success:function (data) {
+                    if (data.status) {
+                        window.location.href = '/host/manager.html'
+                    } else {
+                         $.each(data.err_msg,function (key,value) {
+                            var $span = document.createElement('span');
+                             $span.setAttribute('class','warning');
+                             $span.innerHTML = value;
+                            $('#'+ key).after($span);
+                        })
+                    }
+                }
+            })
+
+        })
+    </script>
+
+
+
+{% endblock %}
