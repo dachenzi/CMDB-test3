@@ -19,4 +19,7 @@ urlpatterns = [
     url(r'^index.html',views.Index.as_view()),
     url(r'^manager.html',views.Manager.as_view()),
     url(r'^addhost.html',views.AddHost.as_view()),
+    url(r'^business.html',views.BusinessManager.as_view()),
+    url(r'^addbusiness.html',views.AddBusiness.as_view()),
+    url(r'^userlist.html',views.UserInfo.as_view()),
 ]

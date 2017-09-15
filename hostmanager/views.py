@@ -18,8 +18,9 @@ def auth(func):
     return inner
 
 
-@method_decorator(auth, name='get')
+
 class Index(View):
+    @method_decorator(auth)
     def get(self, request):
         user_list = User.objects.all()
         host_list = Host.objects.all()
@@ -99,3 +100,68 @@ class AddHost(View):
 
 
 
+class BusinessManager(View):
+
+    @method_decorator(auth)
+    def get(self,request):
+
+        business_list = Business.objects.all()
+
+        return render(request,'business.html',locals())
+
+
+
+class BusinessAdd(Form):
+
+    title = fields.CharField(
+        max_length=16,
+        error_messages={'required':'业务线名称不能为空',
+                        'max_length':'业务线名称不能超过16'},
+        widget = widgets.TextInput(attrs={'class': 'form-control', 'id': 'title', 'placeholder': "名称"})
+    )
+
+
+class AddBusiness(View):
+
+    ret_code = {'status':True,'err_msg':{}}
+
+    @method_decorator(auth)
+    def get(self, request):
+
+        ba = BusinessAdd()
+
+        return render(request,'addbusiness.html',locals())
+
+    def post(self,request):
+
+        print(request.POST)
+        ba = BusinessAdd(data=request.POST)
+
+        if ba.is_valid():
+
+            bus_obj = Business.objects.filter(title=ba.cleaned_data['title'])
+
+            if bus_obj:
+
+                self.ret_code['status'] = False
+                self.ret_code['err_msg'] = {'title':'业务线名称已存在！'}
+
+            else:
+
+                self.ret_code['status'] = True
+                Business.objects.create(**ba.cleaned_data)
+
+        else:
+            self.ret_code['status'] = False
+            self.ret_code['err_msg'] = ba.errors
+
+        return HttpResponse(json.dumps(self.ret_code))
+
+
+class UserInfo(View):
+
+    def get(self,request):
+
+        user_list = User.objects.all()
+
+        return render(request,'userlist.html',locals())

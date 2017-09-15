@@ -6,6 +6,7 @@ class Business(models.Model):
 
     title = models.CharField(max_length=32)
 
+
 class Host(models.Model):
 
     hostname = models.CharField(max_length=32)
