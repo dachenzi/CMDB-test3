@@ -139,25 +139,25 @@
                 {% block content_main %}
                     <div class="col-md-4">
                         <div class="main-box mb-red">
-                            <a href="#">
+                            <a href="/host/manager.html">
                                 <i class="fa fa-bolt fa-5x"></i>
-                                <h5>200 台主机</h5>
+                                <h5>{{ host_list.count }} 台主机</h5>
                             </a>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="main-box mb-dull">
-                            <a href="#">
+                            <a href="/host/userlist.html">
                                 <i class="fa fa-plug fa-5x"></i>
-                                <h5>34 个用户</h5>
+                                <h5>{{ user_list.count }} 个用户</h5>
                             </a>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="main-box mb-pink">
-                            <a href="#">
+                            <a href="/host/business.html">
                                 <i class="fa fa-dollar fa-5x"></i>
-                                <h5>8 个事业线</h5>
+                                <h5>{{ business_list.count }} 个事业线</h5>
                             </a>
                         </div>
                     </div>

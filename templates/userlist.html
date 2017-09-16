@@ -2,12 +2,15 @@
 
 
 {% block content_title %}
+
     <h1 class="page-head-line">用户信息</h1>
     <h1 class="page-subhead-line"><strong style="font-family: Consolas;font-style:normal">所有可以登陆平台的用户列表，操作请慎重。</strong></h1>
+
 {% endblock %}
 
 
 {% block content_main %}
+
     <div class="col-md-12">
 
         <div class="table-responsive">
@@ -107,7 +110,6 @@
         </div>
     </div>
 
-
 {% endblock %}
 
 {% block content_bottom %}
@@ -162,4 +164,5 @@
             $('#delhost').find($("[name='message']")).text("您确定要删除主机：" + hostaddr + '?')
         })
     </script>
+
 {% endblock %}

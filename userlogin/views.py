@@ -17,7 +17,8 @@ class UserCheck(Form):  # 注册的form验证
                         'min_length': '用户名长度不能小于5',
                         'max_length': '用户名长度不能大于12'},
         widget = widgets.TextInput(attrs={'class':'form-control',
-                                          'placeholder':'用户名'})
+                                          'placeholder':'用户名',
+                                          'id':'username'})
     )
     password = fields.CharField(
         min_length=5,
@@ -26,13 +27,15 @@ class UserCheck(Form):  # 注册的form验证
                         'min_length': '密码长度不能小于5',
                         'max_length': '用户名长度不能大于12'},
         widget=widgets.PasswordInput(attrs={'class': 'form-control',
-                                        'placeholder': '密 码'})
+                                        'placeholder': '密 码',
+                                            'id':'password'})
     )
     email = fields.EmailField(
         error_messages={'required': '邮箱不能为空',
                         'invalid':'邮箱格式不正确'},
         widget=widgets.TextInput(attrs={'class': 'form-control',
-                                            'placeholder': '邮 箱'})
+                                            'placeholder': '邮 箱',
+                                        'id':'email'})
     )
     role_id = fields.ChoiceField(
         choices=[],
@@ -43,6 +46,7 @@ class UserCheck(Form):  # 注册的form验证
     def __init__(self,*args,**kwargs):
         super(UserCheck, self).__init__(*args,**kwargs)
         self.fields['role_id'].choices = list(models.Role.objects.values_list('id','role_name'))
+
 
 class LoginCheck(Form):   # 登陆时的form表单验证
     username = fields.CharField(
@@ -55,6 +59,7 @@ class LoginCheck(Form):   # 登陆时的form表单验证
         widget = widgets.PasswordInput(attrs={'class': 'form-control',
                                           'placeholder': '密 码'})
     )
+
 
 class UserLogin(View):
 

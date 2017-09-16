@@ -22,4 +22,7 @@ urlpatterns = [
     url(r'^business.html',views.BusinessManager.as_view()),
     url(r'^addbusiness.html',views.AddBusiness.as_view()),
     url(r'^userlist.html',views.UserInfo.as_view()),
+    url(r'^adduser.html',views.AddUser.as_view()),
+    url(r'^delhost.html',views.DelHost.as_view()),
+    url(r'^modifyhost.html',views.ModifyHost.as_view()),
 ]

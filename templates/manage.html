@@ -3,7 +3,8 @@
 
 {% block content_title %}
     <h1 class="page-head-line">主机信息</h1>
-    <h1 class="page-subhead-line"><strong style="font-family: Consolas;font-style:normal">主机是运维日常维护工作的伙伴，请好好对它。</strong></h1>
+    <h1 class="page-subhead-line"><strong style="font-family: Consolas;font-style:normal">主机是运维日常维护工作的伙伴，请好好对它。</strong>
+    </h1>
 {% endblock %}
 
 
@@ -45,11 +46,11 @@
                         <td>{{ host.business.title }}</td>
                         <td>
                             <button type="button" class="btn btn-primary" data-toggle="modal" name="edithost"
-                                    data-target="#edithost" hid="{{ host.hid }}">
+                                    data-target="#edithost" hid="{{ host.id }}">
                                 编辑
                             </button>
                             <button type="button" class="btn btn-info" data-toggle="modal" name="delhost"
-                                    data-target="#delhost" hid="{{ host.hid }}" hostaddr="{{ host.ipaddr }}">
+                                    data-target="#delhost" hid="{{ host.id }}" hostaddr="{{ host.ip }}">
                                 删除
                             </button>
 
@@ -70,31 +71,27 @@
                         <h4 class="modal-title" id="exampleModalLabel">编辑主机</h4>
                     </div>
                     <div class="modal-body">
-                        <form>
+                        <form id = 'modify_host'>
+                            {% csrf_token %}
+                            <div style="display: none">
+                                <input type="text" name="id">
+                            </div>
+
                             <div class="input-group">
                                 <span class="input-group-addon" id="modify_hostname">主机名称</span>
-                                <input type="text" class="form-control" placeholder="hostname"
-                                       aria-describedby="sizing-addon2">
+                                <input type="text" class="form-control" placeholder="hostname" name="hostname">
                             </div>
                             <div class="input-group">
                                 <span class="input-group-addon" id="modify_ipaddr">主机地址</span>
-                                <input type="text" class="form-control" placeholder="0.0.0.0"
-                                       aria-describedby="sizing-addon2">
+                                <input type="text" class="form-control" placeholder="0.0.0.0" name="ip">
                             </div>
                             <div class="input-group">
-                                <span class="input-group-addon" id="modify_serviceline">所属业务</span>
-                                <select class="form-control">
-                                    {% for service in service_list %}
-                                        <option value="{{ service.sid }}">{{ service.sname }}</option>
-                                    {% endfor %}
-                                </select>
+                                <span class="input-group-addon" id="modify_port">主机端口</span>
+                                <input type="text" class="form-control" placeholder="0" name="port">
                             </div>
                             <div class="input-group">
-                                <span class="input-group-addon" id="modify_admin">管理人员</span>
-                                <select multiple class="form-control" id='admin'>
-                                    {% for user in user_list %}
-                                        <option value="{{ user.uid }}">{{ user.username }}</option>
-                                    {% endfor %}
+                                <span class="input-group-addon" id="modify_admin">归属业务</span>
+                                <select class="form-control" name='business_id'>
                                 </select>
                             </div>
 
@@ -102,13 +99,32 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                        <button type="button" class="btn btn-primary">确认</button>
+                        <button type="button" class="btn btn-primary" id="ok" >确认</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+
+    <!-- 删除主机模态对话框 -->
+    <div class="modal fade" id="delhost" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title" id="myModalLabel">友情提示</h4>
+                </div>
+                <div class="modal-body">
+                    <h3 name="message"></h3>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id='deletehost'>确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}
 
@@ -119,49 +135,101 @@
 {% block jquery %}
 
     <script>
+        {# 全选 #}
         $("[name='allcheck']").click(function () {
             $('table').find($('input')).each(function () {
                 $(this).prop('checked', true)
             })
         });
 
+        {# 取消 #}
         $("[name='allcancel']").click(function () {
             $('table').find($('input')).each(function () {
                 $(this).prop('checked', false)
             })
         });
 
+        {# 反选 #}
         $("[name='revcheck']").click(function () {
             $('table').find($('input')).each(function () {
                 $(this).prop('checked', !$(this).prop('checked'));
             })
         });
 
-        $("[name='addhostok']").click(function () {
+        {# 编辑主机 #}
+        $("[name='edithost']").click(function () {
             $.ajax({
-                url: '/manage/addhost/',
+                url: '/host/manager.html',
                 type: 'post',
-                traditional: true,
-                data: {
-                    'csrfmiddlewaretoken': "{{ csrf_token }}",
-                    'hostname': $('#add_hostname').val(),
-                    'ipaddr': $('#add_ipaddr').val(),
-                    'serviceline': $('#add_serviceline').val(),
-                    'admin': $('#add_admin').val()
-                },
+                dataType: 'json',
+                data: {'id': $(this).attr('hid'), 'csrfmiddlewaretoken': '{{ csrf_token }}'},
                 success: function (data) {
-                    data = JSON.parse(data);
-                    if (data['status']) {
-                        location.reload()
-                    }
-                }
 
+                    {# 添加select标签 #}
+                    $.each(data[0], function (k, v) {
+                        $("[name='business_id").find('option').remove();
+                        if (typeof v === 'object') {
+                            $.each(v, function (id, value) {
+                                var $op = document.createElement('option');
+                                $op.setAttribute('id', value[0]);
+                                $op.innerHTML = value[1];
+                                $("[name='business_id").append($op)
+                            })
+                        }
+                    });
+
+                    {# 添加默认数据 #}
+                    $.each(data[0],function (k,v) {
+                         if ($("[name=" + k + "]").is('select')) {
+                             $("[name=" + k + "]").find("option[id=\'" + v + "\']").attr('selected','true');
+                         } else {
+                             $("[name=" + k + "]").val(v);
+                         }
+                    })
+                }
             })
         });
 
+        {# 删除主机模态对话框信息传递 #}
         $("[name='delhost']").click(function () {
             var hostaddr = $(this).attr('hostaddr');
-            $('#delhost').find($("[name='message']")).text("您确定要删除主机：" + hostaddr + '?')
+            var hostid = $(this).attr('hid');
+            $('#delhost').find($("[name='message']")).text("您确定要删除主机：" + hostaddr + '?');
+            $('#deletehost').attr('hid', hostid);
+        });
+
+        {# 删除主机 #}
+        $('#deletehost').click(function () {
+            $.ajax({
+                url: '/host/delhost.html',
+                dataType: 'json',
+                type: 'post',
+                data: {'csrfmiddlewaretoken': "{{ csrf_token }}", 'hid': $(this).attr('hid')},
+                success: function (data) {
+                    if (data = 'ok') {
+                        location.reload()
+                    }
+                }
+            })
+        });
+
+        $('#ok').click(function () {
+            $.ajax({
+                url:'/host/modifyhost.html',
+                type:'post',
+                dataType:'json',
+                data:$("#modify_host").serialize(),
+                success:function (data) {
+
+                    if (data === 'ok') {
+                        window.location.href = '/host/manager.html'
+                    }
+
+                }
+            })
+
         })
+
     </script>
+
 {% endblock %}
