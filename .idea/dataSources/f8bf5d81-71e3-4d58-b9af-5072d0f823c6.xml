@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<dataSource name="db">
+<dataSource name="db [2]">
   <database-model serializer="dbm" rdbms="SQLITE" format-version="4.0">
     <root id="1"/>
     <schema id="2" parent="1">
@@ -430,7 +430,7 @@ model</ColNames>
       <DataType>INTEGER(0,-1)|4</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="97" parent="14" name="business_id_id">
+    <column id="97" parent="14" name="business_id">
       <Position>4</Position>
       <DataType>INTEGER(0,-1)|4</DataType>
       <NotNull>1</NotNull>
@@ -441,7 +441,7 @@ model</ColNames>
     </key>
     <foreign-key id="99" parent="14" name="#FAKE_hostmanager_host_1">
       <NameSurrogate>1</NameSurrogate>
-      <ColNames>business_id_id</ColNames>
+      <ColNames>business_id</ColNames>
       <Deferrable>1</Deferrable>
       <InitiallyDeferred>1</InitiallyDeferred>
       <RefTableName>hostmanager_business</RefTableName>
